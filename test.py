@@ -14,5 +14,5 @@ json = {
   }
 }
 
-res = requests.post(json)
+res = requests.post(url, json = json)
 print(res.text)

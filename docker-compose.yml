@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  main_node:
+  compute_node1:
     image: python:3.11
     command: python3 uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload
     volumes:
@@ -9,3 +9,15 @@ services:
     working_dir: /code
     ports: 
       - 3000:3000
+  
+  compute_node2:
+    image: python:3.11
+    command: python3 uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload
+    volumes:
+      - ./app:/code/app
+    working_dir: /code
+    ports: 
+      - 3000:3000
+  
+  main_node:
+    

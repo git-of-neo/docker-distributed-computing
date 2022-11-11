@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List
+from jinja2 import Environment, FileSystemLoader
 
 app = FastAPI()
+environment = Environment(loader = FileSystemLoader("templates/"))
 
 class Row(BaseModel):
     data : List[int]
@@ -14,11 +17,10 @@ class Col(BaseModel):
 class Point(BaseModel):
     value : int
 
-@app.get("/")
+@app.get("/", response_class = HTMLResponse)
 async def root():
-    return {
-        "Loaded" : True
-    }
+    template = environment.get_template("index.html")
+    return template.render()
 
 @app.post("/api/compute", response_model = Point)
 async def compute(row: Row, col: Col):
@@ -32,3 +34,4 @@ async def compute(row: Row, col: Col):
 #     return {
 #         "Loaded" : True
 #     }
+
