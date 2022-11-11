@@ -5,7 +5,7 @@ import httpx
 import requests
 import json
 
-url = f"http://node1:3000/api/compute"
+url = f"http://node2:3001/api/compute"
 data1 = {
   "row": {
     "data": [

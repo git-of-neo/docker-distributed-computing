@@ -102,7 +102,7 @@ async def distribute(m1 : List[List[int]], m2 : List[List[int]]):
     row = len(m1)
     col = len(m2[0])
     n = row * col
-    unflatten_index = lambda x : (x//row, x % col)
+    unflatten_index = lambda x : (x//col, x % col)
     get_col = lambda x, j : list(map(lambda row : row[j], x))
     
     task_per_node = max(n // len(nodes), 1)

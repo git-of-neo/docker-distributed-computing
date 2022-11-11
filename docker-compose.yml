@@ -11,8 +11,8 @@ services:
       - 3000:3000
     expose:
       - 3000
-    stdin_open: true
-    tty: true
+    # stdin_open: true
+    # tty: true
     networks:
       - fastapi-network
     environment:
