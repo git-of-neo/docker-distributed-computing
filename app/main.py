@@ -8,6 +8,7 @@ import httpx
 import asyncio
 import requests
 import os
+import json
 
 app = FastAPI()
 environment = Environment(loader = FileSystemLoader("templates/"))
@@ -86,27 +87,61 @@ async def ping_neighbours():
 # TODO : fix distribution
 # referenced : https://stackoverflow.com/questions/63872924/how-can-i-send-an-http-request-from-my-fastapi-app-to-another-site-api
 # for asynchronous requests
-async def get_compute(client, url, json):
-    res = await client.post(url, data = json)
-    return res.json().value
+# async def get_compute(client, url, json):
+#     res = await client.post(url, data = json)
+#     return res.json().value
 
-async def distribute(matrix1, matrix2):
-    # distribute workload (point based workload distribution, there are faster algorithms like fox algo but stick to basic for now)
+# async def distribute(matrix1, matrix2):
+#     # distribute workload (point based workload distribution, there are faster algorithms like fox algo but stick to basic for now)
+#     async with httpx.AsyncClient() as client:
+#         res = [[0] * len(matrix1)] * len(matrix2[0]) # collection to store results
+#         for i in range(len(matrix1)):
+#             for j in range(len(matrix2[0])):
+#                 flattened_index = i*len(matrix2[0]) + j 
+#                 res[i][j] = get_compute(client, json = {
+#                     "row" : {
+#                         "data" : matrix1[i]
+#                     },
+#                     "col" : {
+#                         "data" : list(map(lambda x : x[j], matrix2))
+#                     }
+#                 }, url = f"{origins[flattened_index % len(origins) ]}/compute")
+#         res = await asyncio.gather(*res)
+#     return res
+
+async def compute_point(client, node_no : int, row : List[int], col : List[int]):
+    payload = {
+        "row" : {
+            "data" : row
+        }, 
+        "col" : {
+            "data" : col
+        }, 
+    }
+    payload = json.dumps(payload)
+    port = ports[node_no]
+    response = await client.post(f"http://{nodes[node_no]}:{port}/api/compute", data = payload)
+    return response.json()["value"]
+
+async def distribute(m1 : List[List[int]], m2 : List[List[int]]):
+    row = len(m1)
+    col = len(m2[0])
+    n = row * col
+    unflatten_index = lambda x : (x//row, x % col)
+    get_col = lambda x, j : list(map(lambda row : row[j], x))
+    
+    task_per_node = max(n // len(nodes), 1)
+    
     async with httpx.AsyncClient() as client:
-        res = [[0] * len(matrix1)] * len(matrix2[0]) # collection to store results
-        for i in range(len(matrix1)):
-            for j in range(len(matrix2[0])):
-                flattened_index = i*len(matrix2[0]) + j 
-                res[i][j] = get_compute(client, json = {
-                    "row" : {
-                        "data" : matrix1[i]
-                    },
-                    "col" : {
-                        "data" : list(map(lambda x : x[j], matrix2))
-                    }
-                }, url = f"{origins[flattened_index % len(origins) ]}/compute")
-        res = await asyncio.gather(*res)
-    return res
+        tasks = []
+        for task_no in range(n):
+            node_no = min(task_no // task_per_node, len(nodes)-1)
+            i, j = unflatten_index(task_no)
+            tasks.append(compute_point(client, node_no, m1[i], get_col(m2, j)))
+        res = await asyncio.gather(*tasks)
+
+    # format into matrix
+    return [ res[(i * col) : (i * col + col)] for i in range(row)] # <-- format error]
 
 @app.post("/api/multiply_matrix", response_model = Matrix)
 # dot product
