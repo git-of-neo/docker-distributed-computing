@@ -1,23 +1,41 @@
 version: "3.7"
 
 services:
-  compute_node1:
-    image: python:3.11
-    command: python3 uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload
+  node1:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 3000 --reload
     volumes:
-      - ./app:/code/app
-    working_dir: /code
+      - ./app:/app
+    working_dir: /app
     ports: 
       - 3000:3000
-  
-  compute_node2:
-    image: python:3.11
-    command: python3 uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload
+    networks:
+      app-network:
+
+  node2:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 3001 --reload
     volumes:
-      - ./app:/code/app
-    working_dir: /code
+      - ./app:/app
+    working_dir: /app
     ports: 
-      - 3000:3000
+      - 3001:3001
+    networks:
+      app-network:
   
-  main_node:
+  node3:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 3002 --reload
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    ports: 
+      - 3002:3002
+    networks:
+      app-network:
+
+volumes:
+  app:
     
+networks:
+  app-network:
