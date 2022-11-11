@@ -84,31 +84,6 @@ async def ping_neighbours():
             res.append(requests.post(url).status_code==200)
     return {"alive" : all(res)}
 
-# TODO : fix distribution
-# referenced : https://stackoverflow.com/questions/63872924/how-can-i-send-an-http-request-from-my-fastapi-app-to-another-site-api
-# for asynchronous requests
-# async def get_compute(client, url, json):
-#     res = await client.post(url, data = json)
-#     return res.json().value
-
-# async def distribute(matrix1, matrix2):
-#     # distribute workload (point based workload distribution, there are faster algorithms like fox algo but stick to basic for now)
-#     async with httpx.AsyncClient() as client:
-#         res = [[0] * len(matrix1)] * len(matrix2[0]) # collection to store results
-#         for i in range(len(matrix1)):
-#             for j in range(len(matrix2[0])):
-#                 flattened_index = i*len(matrix2[0]) + j 
-#                 res[i][j] = get_compute(client, json = {
-#                     "row" : {
-#                         "data" : matrix1[i]
-#                     },
-#                     "col" : {
-#                         "data" : list(map(lambda x : x[j], matrix2))
-#                     }
-#                 }, url = f"{origins[flattened_index % len(origins) ]}/compute")
-#         res = await asyncio.gather(*res)
-#     return res
-
 async def compute_point(client, node_no : int, row : List[int], col : List[int]):
     payload = {
         "row" : {
@@ -157,11 +132,3 @@ async def multiply_matrix(m1 : Matrix, m2 : Matrix):
     return {
         "data" : res
     }
-
-# testing if hot reload is working as aspected
-# @app.get("/something")
-# async def something():
-#     return {
-#         "Loaded" : True
-#     }
-
