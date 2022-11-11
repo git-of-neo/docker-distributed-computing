@@ -2,3 +2,6 @@ fastapi
 uvicorn
 pydantic
 jinja2
+httpx
+asyncio
+requests

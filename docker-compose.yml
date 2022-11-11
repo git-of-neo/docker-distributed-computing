@@ -9,8 +9,14 @@ services:
     working_dir: /app
     ports: 
       - 3000:3000
+    expose:
+      - 3000
+    stdin_open: true
+    tty: true
     networks:
-      app-network:
+      - fastapi-network
+    environment:
+      - NODE_NAME=node1
 
   node2:
     build: .
@@ -20,8 +26,12 @@ services:
     working_dir: /app
     ports: 
       - 3001:3001
+    expose:
+      - 3001
     networks:
-      app-network:
+      - fastapi-network
+    environment:
+      - NODE_NAME=node2
   
   node3:
     build: .
@@ -31,11 +41,15 @@ services:
     working_dir: /app
     ports: 
       - 3002:3002
+    expose:
+      - 3002
     networks:
-      app-network:
+      - fastapi-network
+    environment:
+      - NODE_NAME=node3
 
 volumes:
   app:
     
 networks:
-  app-network:
+  fastapi-network:

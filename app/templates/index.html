@@ -8,7 +8,9 @@
     <textarea id="results">No results loaded yet!</textarea>
     
     <script>
-        const COMPUTE_URL = "http://127.0.0.1:3000/api/compute"
+        const COMPUTE_URL = "http://127.0.0.1:3001/api/compute"
+        // const COMPUTE_URL = "http://172.20.0.6/16:3001/api/compute"
+        // const COMPUTE_URL = "http://172.16.238.2:3001/api/compute"
 
         var data = {
             "row" : {
@@ -22,7 +24,10 @@
         async function get_compute(data){
             var response = await fetch(COMPUTE_URL, {
                 method : "POST",
-                headers : {"content-type" : "application/json"},
+                headers : {
+                    "content-type" : "application/json",
+                    "origin" : "http://node1:3000"
+                },
                 body : JSON.stringify(data)
             })
             return response.json()
