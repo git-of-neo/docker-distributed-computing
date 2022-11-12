@@ -187,11 +187,7 @@
                 })
             })
     })
-
-    // TODO : filter non-numerical input
-
-
-
+ 
     // clear result matrix when change detected
     function clearResultTable(){
         for (let i=0; i<resultTable.rows.length; i++){
@@ -201,9 +197,11 @@
             }
         }
     }
-
+    
     $("input").change(()=>{clearResultTable()})
-
+    
+    // TODO : qol updates for variable matrix size input
+    // TODO : filter non-numerical input
     // TODO : refactor redundant for loops
     </script>
 </div>
