@@ -7,7 +7,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .content{
-            max-width: 500px;
+            max-width: 520px;
             margin: auto;
             text-align: center;
         }
@@ -32,6 +32,20 @@
 
         .col-center{
             align-self: center;
+        }
+
+        .notice{
+            /* referenced : https://codepen.io/sandervolbeda/pen/YbBByY */
+            background-color: lightgoldenrodyellow;
+            border-color: burlywood;
+            color: rgba(138, 109, 59, 1);
+            border-style: solid;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 8px;
+            border-width: 1px;
+            padding-inline: 50px;
+            padding-block: 5px;
         }
     </style>
 </head>
@@ -104,6 +118,13 @@
         <button class="btn" id="fill">Random values</button>
     </div>
 
+    <div class="row">
+        <div class="notice">
+            Please use the provided matrix format, many quality-of-life features and error handling such as dealing with variable 
+            matrix sizes and illegal inputs are not implemented yet.
+        </div>
+    </div>
+    
     <script>
     const COMPUTE_URL = "http://localhost:3000/api/multiply_matrix"
 
