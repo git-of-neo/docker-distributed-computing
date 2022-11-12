@@ -40,6 +40,7 @@ def test_matrix_multiplication(n = 20):
                 }
             })
             print("matrix mult FAILED")
+            break
 
     print("matrix mult PASS")
 
