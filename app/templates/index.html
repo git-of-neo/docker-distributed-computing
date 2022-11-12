@@ -113,17 +113,21 @@
     var submitBtn = document.querySelector("#submit")
     var fillBtn = document.querySelector("#fill")
 
-    // generate random values
-    function fillMatrix(matrix){
+    function matrixApply(matrix, fn){
         for (let i=0; i<matrix.rows.length; i++){
             var thisRow = matrix.rows.item(i).cells
             for (let j=0; j<thisRow.length; j++){ 
-                thisRow.item(j).children[0].value = Math.floor(Math.random() * 10)
+                thisRow.item(j).children[0].value = fn(i,j)
             }
         }
     }
 
-    function fillMatrices(){
+    // generate random values
+    fillMatrix = (matrix) => {
+        matrixApply(matrix, (i,j) => Math.floor(Math.random() * 10))
+    }
+
+    fillMatrices = () => {
         fillMatrix(m1)
         fillMatrix(m2)
     }
@@ -178,31 +182,20 @@
             request_results(data)
                 .then(x => x["data"]) 
                 .then(res => {
-                    for (let i=0; i<res.length; i++){
-                        var thisRow = resultTable.rows.item(i).cells
-                        for (let j=0; j<thisRow.length; j++){
-                            thisRow.item(j).children[0].value = res[i][j]
-                        }
-                    }
+                    matrixApply(resultTable, (i,j) => res[i][j])
                 })
             })
     })
  
     // clear result matrix when change detected
-    function clearResultTable(){
-        for (let i=0; i<resultTable.rows.length; i++){
-            var thisRow = resultTable.rows.item(i).cells
-            for (let j=0; j<thisRow.length; j++){
-                thisRow.item(j).children[0].value = ""
-            }
-        }
+    clearResultTable = () => {
+        matrixApply(resultTable, (i,j) => "")
     }
     
     $("input").change(()=>{clearResultTable()})
     
     // TODO : qol updates for variable matrix size input
     // TODO : filter non-numerical input
-    // TODO : refactor redundant for loops
     </script>
 </div>
 </body>
