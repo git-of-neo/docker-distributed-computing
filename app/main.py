@@ -22,8 +22,9 @@ nodes = [
 ports = ["3000", "3001", "3002"]
 
 # list of allowed origins
-origins = [f"http://{x}" for x in nodes]
-origins.append("http://localhost")
+# origins = [f"http://{x}" for x in nodes]
+# origins.append("http://localhost")
+origins = ["*"] # HOTFIX : allow from all origins, never do this in production environment
 
 # allow cross origin access
 # reference : https://fastapi.tiangolo.com/tutorial/cors/

@@ -1,32 +1,173 @@
+<!DOCTYPE html>
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <style>
+        *{
+            zoom: 1.1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .content{
+            max-width: 500px;
+            margin: auto;
+            text-align: center;
+        }
+        .matrix-point{
+            height: 20px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .row{
+            display: flex;
+        }
+
+        .col{
+            
+        }
+
+        .btn{
+            flex-direction: row;
+            margin: 5px
+        }
+
+        .col-center{
+            align-self: center;
+        }
+    </style>
 </head>
 
 <body>
-    <h1> Matrix Multiplier </h1>
-    
-    <textarea id="results">No results loaded yet!</textarea>
-    
-    <script>
-        const COMPUTE_URL = "http://127.0.0.1:3001/api/compute"
-        // const COMPUTE_URL = "http://172.20.0.6/16:3001/api/compute"
-        // const COMPUTE_URL = "http://172.16.238.2:3001/api/compute"
+<div class="content">
+    <h1> Matrix Multiplier </h1> 
 
-        var data = {
-            "row" : {
-                "data" : [3,4]
-            }, 
-            "col" : {
-                "data" : [1,2]
+    <div class = "row">
+        <table class= = "col" id="m1">
+            <tr>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+            </tr>
+            <tr>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+            </tr>
+            <tr>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+            </tr>
+        </table>
+        <b class="col-center">&#215</b>
+        
+        <table class= = "col" id="m2">
+            <tr>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+            </tr>
+            <tr>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+            </tr>
+            <tr>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+                <td> <input class="matrix-point"></td>
+            </tr>
+        </table>
+
+        <b class="col-center">&#61</b>
+        
+        <table id="resultsTable">
+            <tr>
+                <td> <input class="matrix-point" readonly></td>
+                <td> <input class="matrix-point" readonly></td>
+                <td> <input class="matrix-point" readonly></td>
+            </tr>
+            <tr>
+                <td> <input class="matrix-point" readonly></td>
+                <td> <input class="matrix-point" readonly></td>
+                <td> <input class="matrix-point" readonly></td>
+            </tr>
+            <tr>
+                <td> <input class="matrix-point" readonly></td>
+                <td> <input class="matrix-point" readonly></td>
+                <td> <input class="matrix-point" readonly></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class = "row">
+        <button class="btn" id="submit">Calculate</button>
+        <button class="btn" id="fill">Random values</button>
+    </div>
+
+    <script>
+    const COMPUTE_URL = "http://localhost:3000/api/multiply_matrix"
+
+    var m1 = document.querySelector("#m1")
+    var m2 = document.querySelector("#m2")
+    var resultTable = document.querySelector("#resultsTable")
+    var submitBtn = document.querySelector("#submit")
+    var fillBtn = document.querySelector("#fill")
+
+    // generate random values
+    function fillMatrix(matrix){
+        for (let i=0; i<matrix.rows.length; i++){
+            var thisRow = matrix.rows.item(i).cells
+            for (let j=0; j<thisRow.length; j++){ 
+                thisRow.item(j).children[0].value = Math.floor(Math.random() * 10)
             }
         }
+    }
 
-        async function get_compute(data){
+    function fillMatrices(){
+        fillMatrix(m1)
+        fillMatrix(m2)
+    }
+
+    fillBtn.addEventListener("click", ()=>{
+        fillMatrices()
+        clearResultTable()
+    })
+
+    // read table input and send request to server
+    function matrixFromTable(matrix){
+        var res = []
+        for (let i=0; i<matrix.rows.length; i++){
+            var thisRow = matrix.rows.item(i).cells
+            var matrixRow = []
+            
+            for (let j=0; j<thisRow.length; j++){ 
+                thisCell = thisRow.item(j) // td
+                val = thisCell.children[0].value // input
+                matrixRow.push(val)
+            }
+            res.push(matrixRow)
+        }
+        return res
+    }
+
+    submitBtn.addEventListener("click", ()=>{
+        var matrix1 = matrixFromTable(m1)
+        var matrix2 = matrixFromTable(m2)
+
+        var data = {
+            "m1": {
+                "data": matrix1
+            },
+            "m2": {
+                "data": matrix2
+            }
+            }
+
+        async function request_results(data){
             var response = await fetch(COMPUTE_URL, {
                 method : "POST",
                 headers : {
-                    "content-type" : "application/json",
-                    "origin" : "http://node1:3000"
+                    "content-type" : "application/json"
                 },
                 body : JSON.stringify(data)
             })
@@ -34,9 +175,36 @@
         }
 
         $(document).ready(() => {
-            get_compute(data)
-                .then(x => x["value"]) 
-                .then(y => $("#results").val(y.toString()));
-        })
+            request_results(data)
+                .then(x => x["data"]) 
+                .then(res => {
+                    for (let i=0; i<res.length; i++){
+                        var thisRow = resultTable.rows.item(i).cells
+                        for (let j=0; j<thisRow.length; j++){
+                            thisRow.item(j).children[0].value = res[i][j]
+                        }
+                    }
+                })
+            })
+    })
+
+    // TODO : filter non-numerical input
+
+
+
+    // clear result matrix when change detected
+    function clearResultTable(){
+        for (let i=0; i<resultTable.rows.length; i++){
+            var thisRow = resultTable.rows.item(i).cells
+            for (let j=0; j<thisRow.length; j++){
+                thisRow.item(j).children[0].value = ""
+            }
+        }
+    }
+
+    $("input").change(()=>{clearResultTable()})
+
+    // TODO : refactor redundant for loops
     </script>
+</div>
 </body>
